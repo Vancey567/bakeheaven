@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const path = require('path')
-const ejs = require('ejs')
+// const ejs = require('ejs')
 const expressLayout = require("express-ejs-layouts")
 const mongoose = require('mongoose')
 const session = require('express-session')
@@ -14,18 +14,17 @@ const AdminBro = require('admin-bro')
 const AdminBroMongoose = require('@admin-bro/mongoose')
 const AdminBroExpress = require('@admin-bro/express')
 const fileUpload = require('express-fileupload');
-const multiparty = require("multiparty");
+// const multiparty = require("multiparty");
 
 
 const Menu = require('./app/models/menu')
-const Order = require('./app/models/order')
-const admin = require('./app/http/middleware/admin')
+// const Order = require('./app/models/order')
+// const admin = require('./app/http/middleware/admin')
 
 const PORT = process.env.PORT || 5000
 
 // connecting to Database
-const url = 'mongodb://localhost/cake';
-mongoose.connect(url, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: false });
+mongoose.connect(process.env.MONGO_CONNECTION_URL, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: false });
 const connection = mongoose.connection;
 connection.once('open', () => {
     console.log('Database connected...');
@@ -55,7 +54,7 @@ app.use(session({
     store: mongoStore,
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 * 24 }
-    // cookie: {maxAge: 1000 * 10} // It will expire in 15 sec
+    // cookie: {maxAge: 1000 * 10} // expires in 15 sec
 }))
 
 // Passport config
@@ -88,6 +87,9 @@ app.set('view engine', 'ejs')
 
 // Routes
 require('./routes/web')(app)
+app.use((req, res) => {
+    res.status(404).render('errors/404');
+})
 
 //Admin Bro
 AdminBro.registerAdapter(AdminBroMongoose)
